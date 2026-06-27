@@ -5,9 +5,11 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 
+
 from .serializers import RegisterSerializer
 from .serializers import LoginSerializer
 from .serializers import UserSerializer
+from .serializers import LogoutSerializer
 
 class RegisterView(APIView):
 
@@ -49,3 +51,16 @@ class CurrentUserView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
+    
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = LogoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(
+            {"message": "Logged out successfully"},
+            status=status.HTTP_205_RESET_CONTENT,
+        )
